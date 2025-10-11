@@ -26,7 +26,7 @@ This project implements state-of-the-art deep learning models for medical image 
 
 ```bash
 # Clone the repository
-git clone https://github.com/yourusername/medical-image-segmentation.git
+git clone https://github.com/Dashtid/medical-image-segmentation.git
 cd medical-image-segmentation
 
 # Install dependencies
@@ -36,22 +36,32 @@ uv sync
 ## Quick Start
 
 ```bash
-# Train models for all experts
-python scripts/train.py --config configs/brain_growth.yaml
+# Train a model with default configuration
+uv run python scripts/train.py --config configs/brain_growth.yaml
 
-# Train for specific expert
-python scripts/train.py --config configs/kidney.yaml --expert 1
+# Train for specific expert (multi-expert datasets)
+uv run python scripts/train.py --config configs/kidney.yaml --expert 1
+
+# Evaluate trained models
+uv run python scripts/evaluate.py --config configs/brain_growth.yaml --model-dir models/
+
+# Run inference on new data
+uv run python scripts/inference.py --model models/unet.h5 --input data/test/ --output results/
 ```
 
-## Results
+## Available Datasets
 
-Performance on QUBIQ Challenge datasets:
+This toolkit supports various medical imaging datasets. Example configurations are provided for:
 
-| Dataset | DICE Score | Top Leaderboard |
-|---------|------------|----------------|
-| Brain Growth | 0.9034 | 0.5548 |
-| Kidney | 0.9181 | 0.8532 |
-| **Average** | **0.864** | **0.7778** |
+- **Brain MRI**: Brain tumor and growth segmentation
+- **Kidney CT**: Renal structure segmentation
+- **Prostate MRI**: Prostate gland segmentation
+- **Custom datasets**: Easily adaptable via YAML configuration files
+
+For dataset downloads, see publicly available resources:
+- [Medical Segmentation Decathlon](http://medicaldecathlon.com/) - 2,633 images across 10 tasks
+- [AMOS Dataset](https://amos22.grand-challenge.org/) - 500 CT + 100 MRI scans with 15 organ annotations
+- [IMIS-Bench](https://github.com/IMIS-Bench/IMIS-Bench) - 6.4M images with 273.4M masks across 14 modalities
 
 ## Architecture Variants
 
