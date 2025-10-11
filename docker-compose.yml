@@ -1,0 +1,110 @@
+version: '3.8'
+
+services:
+  # Training service
+  train:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: medical-image-segmentation:latest
+    container_name: medseg-train
+    volumes:
+      - ./data:/data:ro
+      - ./models:/models
+      - ./logs:/app/logs
+      - ./checkpoints:/app/checkpoints
+    environment:
+      - CUDA_VISIBLE_DEVICES=0
+      - TF_CPP_MIN_LOG_LEVEL=2
+    command: >
+      python scripts/train.py
+      --config configs/brain_growth.yaml
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+    restart: "no"
+
+  # Evaluation service
+  evaluate:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: medical-image-segmentation:latest
+    container_name: medseg-evaluate
+    volumes:
+      - ./data:/data:ro
+      - ./models:/models:ro
+      - ./results:/results
+    environment:
+      - CUDA_VISIBLE_DEVICES=0
+    command: >
+      python scripts/evaluate.py
+      --config configs/brain_growth.yaml
+      --model-dir /models/brain-growth
+      --output /results
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+    restart: "no"
+
+  # Inference service
+  inference:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: medical-image-segmentation:latest
+    container_name: medseg-inference
+    volumes:
+      - ./data:/data:ro
+      - ./models:/models:ro
+      - ./predictions:/predictions
+    environment:
+      - CUDA_VISIBLE_DEVICES=0
+    command: >
+      python scripts/inference.py
+      --ensemble
+      --config configs/brain_growth.yaml
+      --model-dir /models/brain-growth
+      --input /data/new_images
+      --output /predictions
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+    restart: "no"
+
+  # Jupyter notebook service
+  notebook:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: medical-image-segmentation:latest
+    container_name: medseg-notebook
+    ports:
+      - "8888:8888"
+    volumes:
+      - ./notebooks:/app/notebooks
+      - ./data:/data:ro
+      - ./models:/models:ro
+    environment:
+      - JUPYTER_ENABLE_LAB=yes
+    command: >
+      jupyter lab
+      --ip=0.0.0.0
+      --port=8888
+      --no-browser
+      --allow-root
+      --NotebookApp.token=''
+      --NotebookApp.password=''
+    restart: unless-stopped

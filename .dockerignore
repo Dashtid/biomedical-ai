@@ -1,0 +1,57 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+*.egg-info/
+dist/
+build/
+
+# Virtual environments
+.venv/
+venv/
+ENV/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+
+# Git
+.git/
+.gitignore
+
+# Tests
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Data and models (too large)
+data/
+models/
+checkpoints/
+logs/
+results/
+*.nii
+*.nii.gz
+*.h5
+*.keras
+*.hdf5
+
+# Documentation
+docs/
+notebooks/
+*.md
+!README.md
+!QUICKSTART.md
+
+# CI/CD
+.github/
+
+# Archives
+archive_old_code/
+
+# OS
+.DS_Store
+Thumbs.db
